@@ -1,7 +1,12 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
   "cSpell.words": [
     "changelogithub",
     "pathe",
+    "pnpm",
+    "pnpx",
     "tsup"
   ]
 }
