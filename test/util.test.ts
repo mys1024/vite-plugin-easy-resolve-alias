@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { resolve } from 'pathe'
 
 import type { Aliases } from '../src/types'
-import { resolveAlias } from '../src/util'
+import { resolveAliases } from '../src/util'
 
 describe('resolveAlias()', () => {
   const aliases: Aliases = {
@@ -13,7 +13,7 @@ describe('resolveAlias()', () => {
 
   describe('resolve aliases with POSIX style Path', () => {
     it('absolute base dir', async () => {
-      expect(resolveAlias(aliases, '/path/to/project')).toMatchInlineSnapshot(`
+      expect(resolveAliases(aliases, '/path/to/project')).toMatchInlineSnapshot(`
         {
           "@/": "/path/to/project/src/components/",
           "conf": "/path/to/project/src/config.js",
@@ -24,7 +24,7 @@ describe('resolveAlias()', () => {
 
     it('relative base dir', async () => {
       const cwd = resolve(process.cwd())
-      const resolvedAliases = resolveAlias(aliases, 'path/to/project')
+      const resolvedAliases = resolveAliases(aliases, 'path/to/project')
       const relativeAliases: Record<string, string> = {}
       for (const alias of Object.keys(resolvedAliases))
         relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
@@ -38,7 +38,7 @@ describe('resolveAlias()', () => {
     })
 
     it('absolute target path', async () => {
-      expect(resolveAlias({
+      expect(resolveAliases({
         '@/': '/project/src/components/',
         'conf': '/project/src/config.js',
         '~/': '/project/src/',
@@ -54,7 +54,7 @@ describe('resolveAlias()', () => {
 
   describe('resolve aliases with Windows style path', () => {
     it('absolute base dir', async () => {
-      expect(resolveAlias(aliases, 'C:\\path\\to\\project')).toMatchInlineSnapshot(`
+      expect(resolveAliases(aliases, 'C:\\path\\to\\project')).toMatchInlineSnapshot(`
         {
           "@/": "C:/path/to/project/src/components/",
           "conf": "C:/path/to/project/src/config.js",
@@ -65,7 +65,7 @@ describe('resolveAlias()', () => {
 
     it('relative base dir', async () => {
       const cwd = resolve(process.cwd())
-      const resolvedAliases = resolveAlias(aliases, 'path\\to\\project')
+      const resolvedAliases = resolveAliases(aliases, 'path\\to\\project')
       const relativeAliases: Record<string, string> = {}
       for (const alias of Object.keys(resolvedAliases))
         relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
@@ -79,7 +79,7 @@ describe('resolveAlias()', () => {
     })
 
     it('absolute target path', async () => {
-      expect(resolveAlias({
+      expect(resolveAliases({
         '@/': 'C:\\project\\src\\components\\',
         'conf': 'C:\\project\\src\\config.js',
         '~/': 'C:\\project\\src\\',
@@ -96,7 +96,7 @@ describe('resolveAlias()', () => {
   describe('special cases', () => {
     it('complex base dir', async () => {
       const cwd = resolve(process.cwd())
-      const resolvedAliases = resolveAlias(aliases, './path/to/../to/project')
+      const resolvedAliases = resolveAliases(aliases, './path/to/../to/project')
       const relativeAliases: Record<string, string> = {}
       for (const alias of Object.keys(resolvedAliases))
         relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
