@@ -1,0 +1,50 @@
+{
+  "name": "vite-plugin-easy-resolve-alias",
+  "type": "module",
+  "version": "0.9.0",
+  "packageManager": "pnpm@7.12.2",
+  "description": "Make it easy to config Vite's resolve alias.",
+  "author": "mys1024",
+  "license": "MIT",
+  "homepage": "https://github.com/mys1024/vite-plugin-easy-resolve-alias#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mys1024/vite-plugin-easy-resolve-alias.git"
+  },
+  "keywords": [
+    "vite",
+    "vitejs",
+    "plugin",
+    "alias",
+    "resolve",
+    "config",
+    "easy",
+    "simplify"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --dts --format cjs,esm --clean",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "pathe": "^0.3.8"
+  },
+  "devDependencies": {
+    "tsup": "^6.2.3",
+    "typescript": "^4.8.4",
+    "vite": "^3.1.4",
+    "vitest": "^0.23.4"
+  }
+}
