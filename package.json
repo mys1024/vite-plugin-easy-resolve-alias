@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-easy-resolve-alias",
   "type": "module",
-  "version": "0.9.1",
+  "version": "1.0.0",
   "packageManager": "pnpm@7.12.2",
   "description": "Make it easy to config Vite's resolve alias.",
   "author": "mys1024",
