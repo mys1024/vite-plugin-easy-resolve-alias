@@ -1,112 +1,145 @@
 import { describe, expect, it } from 'vitest'
 import { resolve } from 'pathe'
 
-import type { Aliases } from '../src/types'
-import { resolveAliases } from '../src/util'
+import type { AliasArr, AliasMap, Aliases } from '../src/types'
+import {
+  resolveAliasArr,
+  resolveAliasMap,
+  resolveAliases,
+  resolveReplacement,
+} from '../src/util'
+
+describe('resolveReplacement()', () => {
+  describe('POSIX style path', () => {
+    it('absolute replacement', () => {
+      expect(
+        resolveReplacement('/path/to/project/src/'),
+      ).toMatchInlineSnapshot('"/path/to/project/src/"')
+    })
+
+    it('absolute base dir', () => {
+      expect(
+        resolveReplacement('src/', '/path/to/project'),
+      ).toMatchInlineSnapshot('"/path/to/project/src/"')
+    })
+
+    it('relative base dir', () => {
+      const cwd = resolve('./')
+      expect(
+        resolveReplacement('src/', 'relative/path/to/project').replace(`${cwd}/`, ''),
+      ).toMatchInlineSnapshot('"relative/path/to/project/src/"')
+    })
+
+    it('default base dir', () => {
+      const cwd = resolve('./') // default base dir is CWD
+      expect(resolveReplacement('src/')).toBe(`${cwd}/src/`)
+    })
+  })
+
+  describe('Windows style path', () => {
+    it('absolute replacement', () => {
+      expect(
+        resolveReplacement('C:\\path\\to\\project\\src\\'),
+      ).toMatchInlineSnapshot('"C:/path/to/project/src/"')
+    })
+
+    it('absolute base dir', () => {
+      expect(
+        resolveReplacement('src\\', 'C:\\path\\to\\project'),
+      ).toMatchInlineSnapshot('"C:/path/to/project/src/"')
+    })
+
+    it('relative base dir', () => {
+      const cwd = resolve('.\\')
+      expect(
+        resolveReplacement('src\\', 'relative\\path\\to\\project').replace(`${cwd}/`, ''),
+      ).toMatchInlineSnapshot('"relative/path/to/project/src/"')
+    })
+
+    it('default base dir', () => {
+      const cwd = resolve('.\\') // default base dir is CWD
+      expect(resolveReplacement('src\\')).toBe(`${cwd}/src/`)
+    })
+  })
+})
+
+describe('resolveAliasArr()', () => {
+  it('basic', () => {
+    const aliasArr: AliasArr = [
+      { find: '~/', replacement: 'src/' },
+      { find: /^@\//, replacement: 'src/components/' },
+    ]
+    expect(
+      resolveAliasArr(aliasArr, '/project'),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "find": "~/",
+          "replacement": "/project/src/",
+        },
+        {
+          "find": /\\^@\\\\//,
+          "replacement": "/project/src/components/",
+        },
+      ]
+    `)
+  })
+})
+
+describe('resolveAliasMap()', () => {
+  it('basic', () => {
+    const aliasMap: AliasMap = {
+      '~/': 'src/',
+      '@/': 'src/components/',
+    }
+    expect(
+      resolveAliasMap(aliasMap, '/project'),
+    ).toMatchInlineSnapshot(`
+      {
+        "@/": "/project/src/components/",
+        "~/": "/project/src/",
+      }
+    `)
+  })
+})
 
 describe('resolveAlias()', () => {
-  const aliases: Aliases = {
-    '~/': 'src/',
-    '@/': 'src/components/',
-    'conf': 'src/config.js',
-  }
-
-  describe('resolve aliases with POSIX style Path', () => {
-    it('absolute base dir', async () => {
-      expect(resolveAliases(aliases, '/path/to/project')).toMatchInlineSnapshot(`
-        {
-          "@/": "/path/to/project/src/components/",
-          "conf": "/path/to/project/src/config.js",
-          "~/": "/path/to/project/src/",
-        }
-      `)
-    })
-
-    it('relative base dir', async () => {
-      const cwd = resolve(process.cwd())
-      const resolvedAliases = resolveAliases(aliases, 'path/to/project')
-      const relativeAliases: Record<string, string> = {}
-      for (const alias of Object.keys(resolvedAliases))
-        relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
-      expect(relativeAliases).toMatchInlineSnapshot(`
-        {
-          "@/": "path/to/project/src/components/",
-          "conf": "path/to/project/src/config.js",
-          "~/": "path/to/project/src/",
-        }
-      `)
-    })
-
-    it('absolute target path', async () => {
-      expect(resolveAliases({
-        '@/': '/project/src/components/',
-        'conf': '/project/src/config.js',
-        '~/': '/project/src/',
-      }, '/default/base/dir/is/cwd')).toMatchInlineSnapshot(`
-        {
-          "@/": "/project/src/components/",
-          "conf": "/project/src/config.js",
-          "~/": "/project/src/",
-        }
-      `)
-    })
+  it('alias map', () => {
+    const aliases: Aliases = {
+      '~/': 'src/',
+      '@/': 'src/components/',
+      'conf': 'src/config.js',
+    }
+    expect(resolveAliases(aliases, '/project')).toMatchInlineSnapshot(`
+      {
+        "@/": "/project/src/components/",
+        "conf": "/project/src/config.js",
+        "~/": "/project/src/",
+      }
+    `)
   })
 
-  describe('resolve aliases with Windows style path', () => {
-    it('absolute base dir', async () => {
-      expect(resolveAliases(aliases, 'C:\\path\\to\\project')).toMatchInlineSnapshot(`
+  it('alias arr', () => {
+    const aliases: Aliases = [
+      { find: '~/', replacement: 'src/' },
+      { find: 'conf', replacement: 'src/config.js' },
+      { find: /^@\//, replacement: 'src/components/' },
+    ]
+    expect(resolveAliases(aliases, '/project')).toMatchInlineSnapshot(`
+      [
         {
-          "@/": "C:/path/to/project/src/components/",
-          "conf": "C:/path/to/project/src/config.js",
-          "~/": "C:/path/to/project/src/",
-        }
-      `)
-    })
-
-    it('relative base dir', async () => {
-      const cwd = resolve(process.cwd())
-      const resolvedAliases = resolveAliases(aliases, 'path\\to\\project')
-      const relativeAliases: Record<string, string> = {}
-      for (const alias of Object.keys(resolvedAliases))
-        relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
-      expect(relativeAliases).toMatchInlineSnapshot(`
+          "find": "~/",
+          "replacement": "/project/src/",
+        },
         {
-          "@/": "path/to/project/src/components/",
-          "conf": "path/to/project/src/config.js",
-          "~/": "path/to/project/src/",
-        }
-      `)
-    })
-
-    it('absolute target path', async () => {
-      expect(resolveAliases({
-        '@/': 'C:\\project\\src\\components\\',
-        'conf': 'C:\\project\\src\\config.js',
-        '~/': 'C:\\project\\src\\',
-      }, 'C:\\default\\base\\dir\\is\\cwd')).toMatchInlineSnapshot(`
+          "find": "conf",
+          "replacement": "/project/src/config.js",
+        },
         {
-          "@/": "C:/project/src/components/",
-          "conf": "C:/project/src/config.js",
-          "~/": "C:/project/src/",
-        }
-      `)
-    })
-  })
-
-  describe('special cases', () => {
-    it('complex base dir', async () => {
-      const cwd = resolve(process.cwd())
-      const resolvedAliases = resolveAliases(aliases, './path/to/../to/project')
-      const relativeAliases: Record<string, string> = {}
-      for (const alias of Object.keys(resolvedAliases))
-        relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
-      expect(relativeAliases).toMatchInlineSnapshot(`
-        {
-          "@/": "path/to/project/src/components/",
-          "conf": "path/to/project/src/config.js",
-          "~/": "path/to/project/src/",
-        }
-      `)
-    })
+          "find": /\\^@\\\\//,
+          "replacement": "/project/src/components/",
+        },
+      ]
+    `)
   })
 })
