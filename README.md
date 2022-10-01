@@ -10,6 +10,8 @@ npm install -D vite-plugin-easy-resolve-alias
 
 ## Usage
 
+Add this plugin in your `vite.config.js`:
+
 ```javascript
 import { defineConfig } from 'vite'
 import ResolveAlias from 'vite-plugin-easy-resolve-alias'
@@ -21,11 +23,11 @@ export default defineConfig({
 })
 ```
 
-It equals to:
+it equals to:
 
 ```javascript
-import path from 'path'
 import { defineConfig } from 'vite'
+import path from 'path'
 
 export default defineConfig({
   resolve: {
@@ -34,6 +36,27 @@ export default defineConfig({
     }
   }
 })
+```
+
+then you can use the alias you configured:
+
+```javascript
+import bar from '~/bar'
+const foo = bar()
+```
+
+## TypeScript Support
+
+If you are using **TypeScript**, don't forget to configure your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}
 ```
 
 ## License
