@@ -1,12 +1,12 @@
 import type { Plugin } from 'vite'
-import type { Aliases, Options } from './types'
-
 import { resolve } from 'pathe'
+
+import type { Aliases, Options } from './types'
 import { resolveAlias } from './util'
 
 export default (aliases: Aliases, options?: Options): Plugin => {
   const {
-    base = resolve(process.cwd())
+    base = resolve(process.cwd()),
   } = options || {}
 
   return {
@@ -15,6 +15,6 @@ export default (aliases: Aliases, options?: Options): Plugin => {
       resolve: {
         alias: resolveAlias(aliases, base),
       },
-    })
+    }),
   }
 }

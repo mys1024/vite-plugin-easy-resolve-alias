@@ -1,6 +1,6 @@
-import type { Aliases } from './types'
+import { isAbsolute, normalize, resolve } from 'pathe'
 
-import { resolve, isAbsolute, normalize } from 'pathe'
+import type { Aliases } from './types'
 
 export function resolveAlias(aliases: Aliases, base: string) {
   const resolvedAlias: Record<string, string> = {}

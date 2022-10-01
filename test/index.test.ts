@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { resolve } from 'pathe'
+
+import type { Aliases } from '../src/types'
 import { resolveAlias } from '../src/util'
-import { Aliases } from '../src/types'
 
 describe('util/resolveAlias()', () => {
   const aliases: Aliases = {
     '~/': 'src/',
     '@/': 'src/components/',
-    'conf': 'src/config.js'
+    'conf': 'src/config.js',
   }
 
   it('Absolute base dir on POSIX', async () => {
@@ -34,9 +35,9 @@ describe('util/resolveAlias()', () => {
     const cwd = resolve(process.cwd())
     const resolvedAliases = resolveAlias(aliases, 'path/to/project')
     const relativeAliases: Record<string, string> = {}
-    for (const alias of Object.keys(resolvedAliases)) {
+    for (const alias of Object.keys(resolvedAliases))
       relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
-    }
+
     expect(relativeAliases).toMatchInlineSnapshot(`
       {
         "@/": "path/to/project/src/components/",
@@ -50,9 +51,9 @@ describe('util/resolveAlias()', () => {
     const cwd = resolve(process.cwd())
     const resolvedAliases = resolveAlias(aliases, 'path\\to\\project')
     const relativeAliases: Record<string, string> = {}
-    for (const alias of Object.keys(resolvedAliases)) {
+    for (const alias of Object.keys(resolvedAliases))
       relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
-    }
+
     expect(relativeAliases).toMatchInlineSnapshot(`
       {
         "@/": "path/to/project/src/components/",
@@ -66,9 +67,9 @@ describe('util/resolveAlias()', () => {
     const cwd = resolve(process.cwd())
     const resolvedAliases = resolveAlias(aliases, './path/to/../to/project')
     const relativeAliases: Record<string, string> = {}
-    for (const alias of Object.keys(resolvedAliases)) {
+    for (const alias of Object.keys(resolvedAliases))
       relativeAliases[alias] = resolvedAliases[alias].replace(`${cwd}/`, '')
-    }
+
     expect(relativeAliases).toMatchInlineSnapshot(`
       {
         "@/": "path/to/project/src/components/",
