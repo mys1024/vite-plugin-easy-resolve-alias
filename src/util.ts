@@ -4,7 +4,7 @@ import type { AliasTarget, Aliases } from './types'
 
 export function resolveAliasTarget(
   target: AliasTarget,
-  baseDir: string,
+  baseDir = './',
 ) {
   return isAbsolute(target)
     ? normalize(target)
@@ -13,7 +13,7 @@ export function resolveAliasTarget(
 
 export function resolveAliases(
   aliases: Aliases,
-  baseDir: string,
+  baseDir?: string,
 ) {
   const resolvedAlias: Record<string, string> = {}
   for (const alias of Object.keys(aliases)) {
