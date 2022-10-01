@@ -6,14 +6,14 @@ import { resolveAliases } from './util'
 
 export default (aliases: Aliases, options?: Options): Plugin => {
   const {
-    base = resolve(process.cwd()),
+    baseDir = resolve(process.cwd()),
   } = options || {}
 
   return {
     name: 'vite-plugin-easy-resolve-alias',
     config: () => ({
       resolve: {
-        alias: resolveAliases(aliases, base),
+        alias: resolveAliases(aliases, baseDir),
       },
     }),
   }
