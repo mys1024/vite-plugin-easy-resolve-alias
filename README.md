@@ -49,7 +49,7 @@ export default defineConfig({
 
 ## TypeScript Support
 
-If you are using **TypeScript**, don't forget to configure your `tsconfig.json`:
+If you are using **TypeScript**, don't forget to configure your `tsconfig.json` like this:
 
 ```json
 {
